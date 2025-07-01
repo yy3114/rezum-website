@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rezūm 銳準消融系統</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            /* 更豐富的漸層背景 */
+            background: linear-gradient(135deg, #a7e0e9, #67b0d1); /* 從淺藍綠到中藍的漸層 */
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 2rem 1rem;
+            box-sizing: border-box;
+        }
+        .container {
+            max-width: 850px;
+            width: 100%;
+            background-color: #ffffff; /* 保持白色，使其內容更突出 */
+            border-radius: 1.5rem;
+            /* 更明顯的陰影效果 */
+            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.25);
+            overflow: hidden;
+        }
+        .accordion-item {
+            border-bottom: 1px solid rgba(224, 242, 247, 0.5); /* 淺藍綠色的分隔線，帶透明度 */
+            /* 為每個項目增加陰影和過渡，使其看起來更立體 */
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); /* 項目本身的陰影 */
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            margin-bottom: 1rem; /* 增加項目間距 */
+            border-radius: 1rem; /* 圓角 */
+            overflow: hidden; /* 確保陰影和內容在圓角內 */
+        }
+        .accordion-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+        }
+        .accordion-item:hover {
+            transform: translateY(-5px); /* 懸停時輕微上浮 */
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2); /* 懸停時陰影更明顯 */
+        }
+        .accordion-header {
+            cursor: pointer;
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.35rem; /* 標題字體變大 */
+            font-weight: 600;
+            transition: background-color 0.2s ease-in-out;
+        }
+        /* 各項目獨特背景色和文字顏色 */
+        .accordion-item-1 .accordion-header { background-color: #e0f7fa; color: #006064; } /* 淺青色 */
+        .accordion-item-1 .accordion-header:hover { background-color: #b2ebf2; }
+        .accordion-item-2 .accordion-header { background-color: #e8f5e9; color: #2e7d32; } /* 淺綠色 */
+        .accordion-item-2 .accordion-header:hover { background-color: #c8e6c9; }
+        .accordion-item-3 .accordion-header { background-color: #f3e5f5; color: #6a1b9a; } /* 淺紫色 */
+        .accordion-item-3 .accordion-header:hover { background-color: #e1bee7; }
+        .accordion-item-4 .accordion-header { background-color: #fff3e0; color: #ef6c00; } /* 淺橙色 */
+        .accordion-item-4 .accordion-header:hover { background-color: #ffe0b2; }
+        .accordion-item-5 .accordion-header { background-color: #fce4ec; color: #ad1457; } /* 淺粉色 */
+        .accordion-item-5 .accordion-header:hover { background-color: #f8bbd0; }
+        .accordion-item-6 .accordion-header { background-color: #fffde7; color: #fbc02d; } /* 淺黃色 */
+        .accordion-item-6 .accordion-header:hover { background-color: #fff9c4; }
+        .accordion-item-7 .accordion-header { background-color: #e3f2fd; color: #1976d2; } /* 淺藍色 (新項目顏色) */
+        .accordion-item-7 .accordion-header:hover { background-color: #bbdefb; }
+
+
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            padding: 0 1.5rem;
+            transition: max-height 0.4s ease-out, padding 0.4s ease-out;
+        }
+        .accordion-content.active {
+            max-height: 900px; /* 增加最大高度以避免文字遮蔽 */
+            padding: 1.5rem;
+            background-color: #ffffff; /* 內容展開時為白色背景 */
+        }
+        .accordion-content p {
+            font-size: 1.15rem; /* 內容段落字體變大 */
+            line-height: 1.6; /* 增加行高以提高可讀性 */
+            margin-bottom: 1rem; /* 段落間距 */
+        }
+        .accordion-content p:last-child {
+            margin-bottom: 0; /* 最後一個段落無下邊距 */
+        }
+        /* 圖示樣式 */
+        .item-icon {
+            width: 36px; /* 圖示大小 */
+            height: 36px;
+            fill: currentColor; /* 讓圖示顏色繼承父元素文字顏色 */
+            opacity: 1;
+            transform: scale(1) translateX(0) rotateY(0deg); /* 確保初始狀態有 translateX(0) 和 rotateY(0) */
+            transition: opacity 0.4s ease-out, transform 0.4s ease-out;
+        }
+
+        /* 圖示散開動畫 */
+        @keyframes dissipate-effect {
+            0% {
+                opacity: 1;
+                transform: scale(1) translateX(0) rotateY(0deg);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(5.0) translateX(-100px) rotateY(-360deg); /* 放大、向左移動並翻轉 */
+            }
+        }
+
+        /* 當內容展開時，圖示觸發散開動畫 */
+        .item-icon.dissipated {
+            animation: dissipate-effect 1.2s forwards; /* 調整動畫速度為 1.2 秒 */
+        }
+
+        .summary-section {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background-color: #e3f2fd; /* 淺藍色背景 */
+            border-radius: 1rem;
+            border: 1px solid #bbdefb;
+            color: #1976d2; /* 藍色文字 */
+            font-size: 1.15rem;
+            line-height: 1.8;
+            font-weight: 500;
+        }
+        .disclaimer {
+            margin-top: 2rem; /* 保持與上方內容的間距 */
+            padding: 1.5rem;
+            /* 柔和的免責聲明背景 */
+            background-color: #e8f5e9; /* 淺綠色 */
+            border-radius: 1rem;
+            font-size: 1rem; /* 免責聲明字體變大 */
+            color: #556b57; /* 深綠色文字 */
+            border: 1px solid #c8e6c9; /* 綠色邊框 */
+        }
+        .disclaimer h3 {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: #388e3c; /* 較深的綠色標題 */
+            font-size: 1.1rem; /* 免責聲明標題字體變大 */
+        }
+        .content-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 0.75rem;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-3xl md:text-4xl font-bold text-center text-gray-800 py-8 border-b border-gray-200">Rezūm 銳準消融系統介紹</h1>
+
+        <div id="accordion">
+            <!-- 1. 治療原理 -->
+            <div class="accordion-item accordion-item-1">
+                <div class="accordion-header">
+                    <span>1. 治療原理</span>
+                    <svg class="item-icon" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+                    </svg>
+                </div>
+                <div class="accordion-content text-gray-700">
+                    <img src="https://i.postimg.cc/DZ65jPVk/rendering.jpg" alt="Rezūm 治療原理示意圖" class="content-image">
+                    <p>Rezūm（銳淨）是一種利用水蒸氣熱能，透過經尿道探針注射蒸氣到前列腺增生組織中。蒸氣冷凝時釋放熱能，造成細胞壞死。隨後身體自我吸收這些組織，幾週至幾個月內前列腺縮小，解除尿道壓迫。</p>
+                    <p>治療過程快速（單次注射約9秒），最多一次可做15次注射，整體約30分鐘內完成，可局部麻醉或短時間麻醉以進行手術。</p>
+                </div>
+            </div>
+
+            <!-- 2. 適用範圍 -->
+            <div class="accordion-item accordion-item-2">
+                <div class="accordion-header">
+                    <span>2. 適用範圍</span>
+                    <svg class="item-icon" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                        <circle cx="12" cy="12" r="7" stroke="currentColor" stroke-width="1" fill="none"/>
+                        <circle cx="12" cy="12" r="4" stroke="currentColor" stroke-width="0.5" fill="none"/>
+                        <line x1="12" y1="2" x2="12" y2="22" stroke="currentColor" stroke-width="0.5" stroke-dasharray="2 2"/>
+                        <line x1="2" y1="12" x2="22" y2="12" stroke="currentColor" stroke-width="0.5" stroke-dasharray="2 2"/>
+                        <path d="M12 12 L12 2 A10 10 0 0 1 19.07 4.93 Z" fill="currentColor" opacity="0.3"/>
+                        <circle cx="15" cy="15" r="1.5" fill="currentColor"/>
+                        <circle cx="8" cy="8" r="1" fill="currentColor"/>
+                    </svg>
+                </div>
+                <div class="accordion-content text-gray-700">
+                    <p>適用於因良性前列腺增生（BPH）引起的中度至重度下泌尿道症狀（如頻尿、夜尿、尿線細弱、急迫感）患者。</p>
+                    <p>前列腺容量建議介於約30–80 cc，若超過則目前較多採用雷射剝除或簡單切除術。</p>
+                    <p>特別適合未從藥物（如 Alpha-blocker、5-alpha reductase inhibitor）獲得足夠改善者。</p>
+                </div>
+            </div>
+
+            <!-- 3. 治療優勢 -->
+            <div class="accordion-item accordion-item-3">
+                <div class="accordion-header">
+                    <span>3. 治療優勢</span>
+                    <svg class="item-icon" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2L4 5V11C4 16.55 7.84 21.74 12 22.92C16.16 21.74 20 16.55 20 11V5L12 2zM10 17L6 13L7.41 11.59L10 14.17L16.59 7.59L18 9L10 17z"/>
+                    </svg>
+                </div>
+                <div class="accordion-content text-gray-700">
+                    <p>屬微創門診治療，不需開刀或住院，恢復快，一般幾天內可恢復日常活動。</p>
+                    <p>保留性功能：幾乎不會產生逆行射精或勃起功能惡化；研究顯示 80–90% 保持前功能狀態。</p>
+                    <p>成效持久：五年後重治率約 4%（手術）與約11% 需再服藥，顯示有穩定的長期效果。</p>
+                    <p>相較於藥物，效果更佳且免除副作用；比傳統手術風險低、恢復時間短，非常適合想避免侵入性手術者。</p>
+                </div>
+            </div>
+
+            <!-- 4. 治療效果 -->
+            <div class="accordion-item accordion-item-4">
+                <div class="accordion-header">
+                    <span>4. 治療效果</span>
+                    <svg class="item-icon" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.5-.51 1.84-1.22l3.02-7.05c.07-.17.14-.35.14-.53V10z"/>
+                    </svg>
+                </div>
+                <div class="accordion-content text-gray-700">
+                    <p>國際症狀量表（IPSS）改善約 48%，最大尿流率（Qmax）改善約 44%，生活品質提升約 45%，停藥率高。</p>
+                    <p>一年內多數患者症狀改善明顯，三個月起取代傳統療法效果即可感受。</p>
+                    <p>四年臨床追蹤與五年重要試驗皆證實長期療效穩定。</p>
+                </div>
+            </div>
+
+            <!-- 5. 性功能保留 -->
+            <div class="accordion-item accordion-item-5">
+                <div class="accordion-header">
+                    <span>5. 性功能保留</span>
+                    <svg class="item-icon" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 21.35L10.55 20.03C5.4 15.36 2 12.28 2 8.5C2 5.42 4.42 3 7.5 3C9.24 3 10.91 3.81 12 5.08C13.09 3.81 14.76 3 16.5 3C19.58 3 22 5.42 22 8.5C22 12.28 18.6 15.36 13.45 20.03L12 21.35Z"/>
+                    </svg>
+                </div>
+                <div class="accordion-content text-gray-700">
+                    <p>多數研究指出，Rezūm 對勃起和射精功能影響極低，甚至部分患者有改善趨勢。</p>
+                    <p>一篇涵蓋四年追蹤研究顯示：原本無性功能障礙者仍維持，原本有輕微勃起困難者部分有改善；12月偶有暫時性下降，但長期未見明顯惡化。</p>
+                    <p>五年追蹤報告未發現任何新發的（de novo）勃起障礙或性功能缺失。</p>
+                </div>
+            </div>
+
+            <!-- 6. 術後注意事項 -->
+            <div class="accordion-item accordion-item-6">
+                <div class="accordion-header">
+                    <span>6. 術後注意事項</span>
+                    <svg class="item-icon" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+                    </svg>
+                </div>
+                <div class="accordion-content text-gray-700">
+                    <p>術後幾週內，可能出現尿急、頻尿、少量血尿或血精，是正常反應，通常會逐漸緩解。</p>
+                    <p>通常需暫時置入尿管數天幫助排尿與消腫。完尿後大多能自行移除尿管。</p>
+                    <p>建議休息一至兩天，避免重體力活動、騎腳踏車、性行為與自慰數天。多喝水，避免刺激性飲料（咖啡、酒精、汽水、果汁）。</p>
+                    <p>若出現高燒、劇痛、無法排尿等異常，需儘速就醫。兩至三週內安排術後追蹤看診。</p>
+                </div>
+            </div>
+
+            <!-- 7. 總結 -->
+            <div class="accordion-item accordion-item-7">
+                <div class="accordion-header">
+                    <span>7. 總結</span>
+                    <svg class="item-icon" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/>
+                    </svg>
+                </div>
+                <div class="accordion-content text-gray-700">
+                    <p>Rezūm 就像把水蒸氣當「微型瀑布」，把前列腺不該那麼大的一塊「溶掉」，讓你能恢復暢通尿流。重點是：不用開刀、不住院、效果好、回復快，而且性福幾乎不打折！如果遇到 BPH 症狀讓您困擾，真的是一個健康且保守但效果很棒的選項 😊</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="disclaimer mt-6">
+            <h3 class="font-semibold">免責聲明：</h3>
+            <p>本簡介內容僅供參考，不能替代專業醫療建議。個案研究的結果不一定能預測其他個案的結果，實際治療效果可能因人而異。在考慮任何醫療處置前，請務必諮詢合格的醫療專業人員。</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const accordionItems = document.querySelectorAll('.accordion-item');
+
+            accordionItems.forEach(item => {
+                const header = item.querySelector('.accordion-header');
+                const content = item.querySelector('.accordion-content');
+                const itemIcon = item.querySelector('.item-icon'); // 選擇圖示
+
+                header.addEventListener('click', () => {
+                    const willBeActive = !content.classList.contains('active');
+
+                    accordionItems.forEach(otherItem => {
+                        if (otherItem !== item) {
+                            const otherContent = otherItem.querySelector('.accordion-content');
+                            const otherItemIcon = otherItem.querySelector('.item-icon');
+                            otherContent.classList.remove('active');
+                            otherItemIcon.classList.remove('dissipated'); // 確保其他圖示重置為可見狀態
+                        }
+                    });
+
+                    content.classList.toggle('active');
+
+                    if (willBeActive) {
+                        itemIcon.classList.add('dissipated'); // 展開時圖示散開
+                    } else {
+                        itemIcon.classList.remove('dissipated'); // 收合時圖示重置
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
